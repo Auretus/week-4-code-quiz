@@ -194,6 +194,13 @@ $(document).ready(function() {
   // Once the prep is done, here's where the main game loop gets going
   $(".start-quiz").on("click", function() {
     // start the game
+    function setTime() {
+      var timerInterval = setInterval(function() {
+        timeLeft--;
+        $(".quiz-timer").textContent = timeLeft + " seconds";
+      });
+      
+    }
   });
   // Or, here's a shortcut to the high scores
   $(".view-highscores").on("click", function() {
