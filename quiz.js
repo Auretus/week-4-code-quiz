@@ -3,6 +3,7 @@
 var questionsLeft;
 var timeLeft = 120;
 var pointsRight = 5;
+var score;
 
 class quizQuestion {
   /* This class creates an object that contains a single question and multiple-choice answers, along with whether each answer is right or wrong
@@ -46,6 +47,7 @@ class quizQuestion {
      * return value: string
      * purpose: return the text of the selected answer
      */
+    index = parseInt(index);
     return this.answers[index].text;
   }
   checkAnswer(index) {
@@ -53,6 +55,7 @@ class quizQuestion {
      * return value: boolean
      * purpose: check whether the answer is correct, and return the answer as a true/false value
      */
+    index = parseInt(index);
     return this.answers[index].rightAnswer;
   }
 }
@@ -67,7 +70,7 @@ questionList.push(
 questionList[questionList.length - 1].addAnswer(". (period)", false);
 questionList[questionList.length - 1].addAnswer("; (semicolon)", true);
 questionList[questionList.length - 1].addAnswer(": (colon)", false);
-questionList[questionList.length - 1].addAnswer("\\ (backslash)", false);
+questionList[questionList.length - 1].addAnswer("/ (slash)", false);
 
 // question 2
 questionList.push(
@@ -160,19 +163,21 @@ questionList[questionList.length - 1].addAnswer("10.0", false);
 questionList[questionList.length - 1].addAnswer('"55.0"', true);
 questionList[questionList.length - 1].addAnswer('"55"', false);
 
+console.log(questionList);
+
 // // question 9
 // questionList.push(new quizQuestion(""));
-// questionList[questionList.length - 1].addAnswer("");
-// questionList[questionList.length - 1].addAnswer("");
-// questionList[questionList.length - 1].addAnswer("");
-// questionList[questionList.length - 1].addAnswer("");
+// questionList[questionList.length - 1].addAnswer("",false);
+// questionList[questionList.length - 1].addAnswer("",false);
+// questionList[questionList.length - 1].addAnswer("",false);
+// questionList[questionList.length - 1].addAnswer("",false);
 
 // // question 10
 // questionList.push(new quizQuestion(""));
-// questionList[questionList.length - 1].addAnswer("");
-// questionList[questionList.length - 1].addAnswer("");
-// questionList[questionList.length - 1].addAnswer("");
-// questionList[questionList.length - 1].addAnswer("");
+// questionList[questionList.length - 1].addAnswer("",false);
+// questionList[questionList.length - 1].addAnswer("",false);
+// questionList[questionList.length - 1].addAnswer("",false);
+// questionList[questionList.length - 1].addAnswer("",false);
 
 // Document manipulation variables below
 var spanQuestionsLeft = document.querySelectorAll(".questions-left");
@@ -180,13 +185,15 @@ var spanTimeLeft = document.querySelectorAll(".quiz-timer");
 var spanPointsRight = document.querySelector(".right-answer");
 var index;
 questionsLeft = parseInt(questionList.length);
+var questionNumber;
+var questionDisplayed;
 
 // landing page prep
 for (index = 0; index < spanQuestionsLeft.length; index++) {
   spanQuestionsLeft[index].textContent = questionsLeft;
 }
 for (index = 0; index < spanTimeLeft.length; index++) {
-  spanTimeLeft[index].textContent = timeLeft + " seconds";
+  spanTimeLeft[index].textContent = timeLeft + "s";
 }
 spanPointsRight.textContent = pointsRight;
 
@@ -194,16 +201,77 @@ $(document).ready(function() {
   // Once the prep is done, here's where the main game loop gets going
   $(".start-quiz").on("click", function() {
     // start the game
-    function setTime() {
+    $("#sub-head").empty();
+    $("#question-block").empty();
+    setTimer();
+    questionNumber = 0;
+    questionDisplayed = false;
+    score = 0;
+    // console.log(questionList[questionNumber]);
+
+    function setTimer() {
+      //start the timer
       var timerInterval = setInterval(function() {
         timeLeft--;
-        $(".quiz-timer").textContent = timeLeft + " seconds";
-      });
-      
+        $(".quiz-timer").text(timeLeft + "s");
+        if (!questionDisplayed) {
+          displayQuestion(questionNumber);
+        }
+
+        $(".quiz-button").on("click", function() {
+          var questionRight = $("<p>");
+          if ($(this).attr("isRight")) {
+            score += pointsRight;
+            questionRight.text("Correct!");
+          } else {
+            timeLeft -= 10;
+            questionRight.text("Wrong!");
+          }
+          questionNumber++;
+          questionsLeft--;
+          questionDisplayed = false;
+          $("#question-block").append(questionRight);
+        });
+
+        if (timeLeft <= 0 || questionsLeft <= 0) {
+          clearInterval(timerInterval);
+          processGameResults();
+        }
+      }, 1000);
     }
   });
   // Or, here's a shortcut to the high scores
   $(".view-highscores").on("click", function() {
     // go to the high scores display
   });
+
+  function displayQuestion(questionNumber) {
+    $("#question-block").empty();
+    $(".questions-left").text(questionsLeft);
+    var h4 = $("<h4>");
+    h4.text("Question " + (questionNumber + 1));
+    $("#sub-head").append(h4);
+    var questionBlock = $("#question-block");
+    var thisQuestion = questionList[questionNumber];
+    // console.log(thisQuestion);
+    var p = $("<p>");
+    // console.log(p);
+    p.text(thisQuestion.printQuestion());
+    questionBlock.append(p);
+    for (var i = 0; i < thisQuestion.answers.length; i++) {
+      var b = $("<button>");
+      b.addClass("btn btn-light btn-block quiz-button");
+      b.append(thisQuestion.printAnswer(i));
+      //   console.log(thisQuestion.checkAnswer(i));
+      if (thisQuestion.checkAnswer(i)) {
+        b.attr("isRight", "true");
+      }
+      questionBlock.append(b);
+    }
+    questionDisplayed = true;
+  }
+
+  function processGameResults() {
+    //stub
+  }
 });

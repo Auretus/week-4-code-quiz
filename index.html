@@ -12,38 +12,21 @@
       crossorigin="anonymous"
     />
   </head>
-  <body style="bg-dark text-white">
+  <body class="bg-dark text-white">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
       <div class="container-lg">
         <span class="navbar-brand">
           Code Quiz
         </span>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarText"
-          aria-controls="navbarText"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarText">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link view-highscores" href="#">View Highscores</a>
-            </li>
-          </ul>
-          <span class="navbar-text text-light">
-            Questions remaining:
-            <span class="text-info questions-left">(num)</span>&nbsp;&nbsp; Time remaining:
-            <span class="text-info quiz-timer">(time)</span>
-          </span>
+        <span class="navbar-text text-white-50">
+          Questions remaining:
+          <span class="text-white questions-left">(num)</span>&nbsp;&nbsp; Time remaining:
+          <span class="text-white quiz-timer">(time)</span>
+        </span>
         </div>
       </div>
     </nav>
-    <div style="container-lg bg-transparent">
+    <div class="container-lg bg-transparent">
       <div class="row"></div>
       <div class="row pt-3">
         <div class="col-lg-2"></div>
@@ -55,7 +38,7 @@
       </div>
       <div class="row">
         <div class="col-lg-2"></div>
-        <div class="col-lg-8 question-block">
+        <div id="question-block" class="col-lg-8">
           <p>
             This quiz will consist of
             <span class="questions-left">(num)</span> questions, all multiple
@@ -68,11 +51,14 @@
           </p>
           <p>
             When you have finished reading the instructions and are ready to
-            begin, click the "Begin Quiz" button below.
+            begin, click the "Begin Quiz" button below. If you want to see the existing high scores, click the "View Highscores" button instead.
           </p>
           <div class="text-center">
             <button type="button" class="btn btn-primary btn-lg start-quiz">
               Begin Quiz
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg view-highscores">
+                View Highscores
             </button>
           </div>
         </div>
