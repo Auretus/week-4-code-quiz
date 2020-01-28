@@ -1,7 +1,7 @@
 "use strict"; // complain when I use undeclared variables by mistake
 // global variable declaration
 var questionsLeft;
-var timeLeft = 120;
+var timeLeft = 60;
 var pointsRight = 5;
 var score;
 
@@ -163,7 +163,7 @@ questionList[questionList.length - 1].addAnswer("10.0", false);
 questionList[questionList.length - 1].addAnswer('"55.0"', true);
 questionList[questionList.length - 1].addAnswer('"55"', false);
 
-console.log(questionList);
+// console.log(questionList);
 
 // // question 9
 // questionList.push(new quizQuestion(""));
@@ -187,6 +187,13 @@ var index;
 questionsLeft = parseInt(questionList.length);
 var questionNumber;
 var questionDisplayed;
+var questionsAnswered;
+var answerChosen;
+var answersRight;
+
+// high score table
+var highScoreTable;
+var highScoreTable_stored;
 
 // landing page prep
 for (index = 0; index < spanQuestionsLeft.length; index++) {
@@ -206,7 +213,10 @@ $(document).ready(function() {
     setTimer();
     questionNumber = 0;
     questionDisplayed = false;
+    answerChosen = false;
     score = 0;
+    questionsAnswered = 0;
+    answersRight = 0;
     // console.log(questionList[questionNumber]);
 
     function setTimer() {
@@ -214,27 +224,40 @@ $(document).ready(function() {
       var timerInterval = setInterval(function() {
         timeLeft--;
         $(".quiz-timer").text(timeLeft + "s");
-        if (!questionDisplayed) {
+        if (!questionDisplayed && questionsLeft > 0) {
           displayQuestion(questionNumber);
-        }
+          answerChosen = false;
 
-        $(".quiz-button").on("click", function() {
-          var questionRight = $("<p>");
-          if ($(this).attr("isRight")) {
-            score += pointsRight;
-            questionRight.text("Correct!");
-          } else {
-            timeLeft -= 10;
-            questionRight.text("Wrong!");
-          }
-          questionNumber++;
-          questionsLeft--;
-          questionDisplayed = false;
-          $("#question-block").append(questionRight);
-        });
+          // event handler for the answer button
+          $(".quiz-button").on("click", function() {
+            if (answerChosen) return;
+            // console.log("Button clicked!");
+            var questionRight = $("<p>");
+            if ($(this).attr("isRight")) {
+              score += pointsRight;
+              answersRight++;
+              questionRight.text("Correct!");
+            } else {
+              if (timeLeft < 10) timeLeft = 0;
+              timeLeft -= 10;
+              questionRight.text("Wrong!");
+            }
+            answerChosen = true;
+            questionsAnswered++;
+            $("#question-block").append(questionRight);
+            questionNumber++;
+            questionsLeft--;
+            // setTimeout(function() {
+              questionDisplayed = false;
+            // }, 1000);
+          });
+        }
 
         if (timeLeft <= 0 || questionsLeft <= 0) {
           clearInterval(timerInterval);
+          $(".questions-left").text("n/a");
+          
+          $(".quiz-timer").text("n/a");
           processGameResults();
         }
       }, 1000);
@@ -246,6 +269,7 @@ $(document).ready(function() {
   });
 
   function displayQuestion(questionNumber) {
+    $("#sub-head").empty();
     $("#question-block").empty();
     $(".questions-left").text(questionsLeft);
     var h4 = $("<h4>");
@@ -262,16 +286,78 @@ $(document).ready(function() {
       var b = $("<button>");
       b.addClass("btn btn-light btn-block quiz-button");
       b.append(thisQuestion.printAnswer(i));
-      //   console.log(thisQuestion.checkAnswer(i));
-      if (thisQuestion.checkAnswer(i)) {
-        b.attr("isRight", "true");
-      }
+      if (thisQuestion.checkAnswer(i)) b.attr("isRight", "true");
       questionBlock.append(b);
     }
     questionDisplayed = true;
   }
 
   function processGameResults() {
-    //stub
+    /* arguments: none
+     * return: none
+     * purpose: Display user's score, give them an opportunity to enter their name for the highscore table
+     */
+
+    // Clear the board
+    $("#sub-head").empty();
+    $("#question-block").empty();
+    if (timeLeft < 0) timeLeft = 0;
+
+    // Display results
+    var h4 = $("<h4>");
+    h4.text("Results");
+    $("#sub-head").append(h4);
+    var ul = $("<ul>");
+    ul.addClass("list-unstyled");
+    var li1 = $("<li>");
+    li1.text(
+      "Questions answered: " + questionsAnswered + "/" + questionList.length
+    );
+    var li2 = $("<li>");
+    li2.text("Correct answers: " + answersRight);
+    var li3 = $("<li>");
+    li3.text("Points earned: " + score);
+    ul.append(li1, li2, li3);
+    $("#question-block").append(ul);
+
+    // Provide user name input for highscore table
+    var inDiv = $("<div>");
+    inDiv.addClass("input-group mb-3");
+    var input = $("<input>");
+    input.attr({id:"playerName", type:"text", maxlength:"15", placeholder:"Enter your name here"});
+    input.addClass("form-control");
+    var submitDiv = $("<div>");
+    submitDiv.addClass("input-group-append");
+    var submitBtn = $("<button>");
+    submitBtn.addClass("btn btn-outline-secondary");
+    submitBtn.attr({type:"button", id:"submit-button"});
+    submitBtn.text("Submit");
+    submitDiv.append(input, submitBtn);
+    inDiv.append(submitDiv);
+    $("#question-block").append(inDiv);
+
+    // Fetch highscore table from local storage...
+    highScoreTable_stored = JSON.parse(
+      localStorage.getItem("codeQuiz_highScoreTable")
+    );
+    if (highScoreTable_stored != null) highScoreTable = highScoreTable_stored;
+    storeHighScores();
+    renderHighScores();
+  }
+
+  function storeHighScores() {
+    /* arguments: none
+     * return: none
+     * purpose: store a copy of the high score table in memory to localstorage
+     */
+    console.log("storeHighScores() called");
+  }
+
+  function renderHighScores() {
+    /* arguments: none
+     * return: none
+     * purpose: display the high score table on screen
+     */
+    console.log("renderHighScores() called");
   }
 });
